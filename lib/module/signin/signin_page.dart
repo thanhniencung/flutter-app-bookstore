@@ -28,12 +28,19 @@ class SignInPage extends StatelessWidget {
   }
 }
 
-class SignInFormWidget extends StatelessWidget {
+class SignInFormWidget extends StatefulWidget {
+  @override
+  _SignInFormWidgetState createState() => _SignInFormWidgetState();
+}
+
+class _SignInFormWidgetState extends State<SignInFormWidget> {
   final TextEditingController _txtPhoneController = TextEditingController();
+
   final TextEditingController _txtPassController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    print('rebuild');
     return Provider<SignInBloc>.value(
       value: SignInBloc(userRepo: Provider.of(context)),
       child: Consumer<SignInBloc>(
@@ -45,44 +52,9 @@ class SignInFormWidget extends StatelessWidget {
               _buildPhoneField(bloc),
               _buildPassField(bloc),
               buildSignInButton(bloc),
-              _buildFooter(),
+              _buildFooter(context),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildSignInButton(SignInBloc bloc) {
-    return StreamProvider<bool>.value(
-      initialData: false,
-      value: bloc.btnStream,
-      child: Consumer<bool>(
-        builder: (context, enable, child) => NormalButton(
-          onPressed: enable
-              ? () {
-                  bloc.event.add(
-                    SignInEvent(
-                      phone: _txtPhoneController.text,
-                      pass: _txtPassController.text,
-                    ),
-                  );
-                }
-              : null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        margin: EdgeInsets.only(top: 30),
-        padding: EdgeInsets.all(10),
-        child: Text(
-          'Đăng ký tài khoản',
-          style: TextStyle(color: AppColor.blue, fontSize: 19),
         ),
       ),
     );
@@ -143,6 +115,46 @@ class SignInFormWidget extends StatelessWidget {
               labelStyle: TextStyle(color: AppColor.blue),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildSignInButton(SignInBloc bloc) {
+    return StreamProvider<bool>.value(
+      initialData: false,
+      value: bloc.btnStream,
+      child: Consumer<bool>(
+        builder: (context, enable, child) => NormalButton(
+          title: 'Sign In',
+          onPressed: enable
+              ? () {
+                  bloc.event.add(
+                    SignInEvent(
+                      phone: _txtPhoneController.text,
+                      pass: _txtPassController.text,
+                    ),
+                  );
+                }
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 30),
+      padding: EdgeInsets.all(10),
+      child: FlatButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/sign-up');
+        },
+        shape: RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(4.0)),
+        child: Text(
+          'Đăng ký tài khoản',
+          style: TextStyle(color: AppColor.blue, fontSize: 19),
         ),
       ),
     );

@@ -5,8 +5,9 @@ import '../app_color.dart';
 
 class NormalButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final String title;
 
-  NormalButton({@required this.onPressed});
+  NormalButton({@required this.onPressed, @required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +17,11 @@ class NormalButton extends StatelessWidget {
       child: RaisedButton(
         onPressed: onPressed,
         color: AppColor.yellow,
+        disabledColor: Colors.yellow[500],
         shape: RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(4.0)),
         child: Text(
-          'Sign In',
+          title,
           style: BtnStyle.normal(),
         ),
       ),

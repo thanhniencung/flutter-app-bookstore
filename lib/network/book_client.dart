@@ -9,7 +9,7 @@ class BookClient {
   static Dio _dio = Dio(_options);
 
   BookClient._internal() {
-    _dio.interceptors.add(LogInterceptor(responseBody: false));
+    _dio.interceptors.add(LogInterceptor(responseBody: true));
   }
   static final BookClient instance = BookClient._internal();
 

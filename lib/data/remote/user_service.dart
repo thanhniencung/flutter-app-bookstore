@@ -11,4 +11,15 @@ class UserService {
       },
     );
   }
+
+  Future<Response> signUp(String displayName, String phone, String pass) {
+    return BookClient.instance.dio.post(
+      '/user/sign-up',
+      data: {
+        'displayName': displayName,
+        'phone': phone,
+        'password': pass,
+      },
+    );
+  }
 }

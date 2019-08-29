@@ -71,10 +71,6 @@ class SignInBloc extends BaseBloc {
       case SignInEvent:
         handleSignIn(event);
         break;
-
-      case SignUpEvent:
-        handleSignUp(event);
-        break;
     }
   }
 
@@ -89,8 +85,6 @@ class SignInBloc extends BaseBloc {
       },
     );
   }
-
-  handleSignUp(event) {}
 
   @override
   void dispose() {
