@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_book_store/data/remote/user_service.dart';
-import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/shared/app_color.dart';
 import 'package:provider/provider.dart';
 
