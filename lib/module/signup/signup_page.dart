@@ -6,6 +6,7 @@ import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/event/signup_event.dart';
 import 'package:flutter_app_book_store/event/signup_fail_event.dart';
 import 'package:flutter_app_book_store/event/signup_sucess_event.dart';
+import 'package:flutter_app_book_store/module/home/home_page.dart';
 import 'package:flutter_app_book_store/module/signup/signup_bloc.dart';
 import 'package:flutter_app_book_store/shared/app_color.dart';
 import 'package:flutter_app_book_store/shared/widget/bloc_listener.dart';
@@ -47,7 +48,11 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
 
   handleEvent(BaseEvent event) {
     if (event is SignUpSuccessEvent) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => HomePage()),
+        ModalRoute.withName('/home'),
+      );
       return;
     }
 

@@ -24,7 +24,6 @@ class _BlocListenerState<T> extends State<BlocListener> {
     var bloc = Provider.of<T>(context) as BaseBloc;
     bloc.processEventStream.listen(
       (event) {
-        print('khong the hieu noi');
         widget.listener(event);
       },
     );
