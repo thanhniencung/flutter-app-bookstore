@@ -5,6 +5,8 @@ import 'package:flutter_app_book_store/base/base_bloc.dart';
 import 'package:flutter_app_book_store/base/base_event.dart';
 import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/event/signup_event.dart';
+import 'package:flutter_app_book_store/event/signup_fail_event.dart';
+import 'package:flutter_app_book_store/event/signup_sucess_event.dart';
 import 'package:flutter_app_book_store/shared/validation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -85,15 +87,22 @@ class SignUpBloc extends BaseBloc {
   }
 
   handleSignUp(event) {
-    SignUpEvent e = event as SignUpEvent;
-    _userRepo.signUp(e.displayName, e.phone, e.pass).then(
-      (userData) {
-        print(userData.displayName);
-      },
-      onError: (e) {
-        print(e);
-      },
-    );
+    btnSink.add(false);
+    loadingSink.add(true); // show loading
+
+    Future.delayed(Duration(seconds: 6), () {
+      SignUpEvent e = event as SignUpEvent;
+      _userRepo.signUp(e.displayName, e.phone, e.pass).then(
+        (userData) {
+          processEventSink.add(SignUpSuccessEvent(userData));
+        },
+        onError: (e) {
+          btnSink.add(true);
+          loadingSink.add(false);
+          processEventSink.add(SignUpFailEvent(e.toString()));
+        },
+      );
+    });
   }
 
   @override

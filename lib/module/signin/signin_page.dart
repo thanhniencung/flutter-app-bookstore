@@ -64,7 +64,7 @@ class _SignInFormWidgetState extends State<SignInFormWidget> {
       value: SignInBloc(userRepo: Provider.of(context)),
       child: Consumer<SignInBloc>(
         builder: (context, bloc, child) {
-          return BlocListener(
+          return BlocListener<SignInBloc>(
             listener: handleEvent,
             child: LoadingTask(
               bloc: bloc,

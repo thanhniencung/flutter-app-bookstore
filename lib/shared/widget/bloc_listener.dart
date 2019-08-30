@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_book_store/base/base_bloc.dart';
 import 'package:flutter_app_book_store/base/base_event.dart';
-import 'package:flutter_app_book_store/module/signin/signin_bloc.dart';
 import 'package:provider/provider.dart';
 
-class BlocListener extends StatefulWidget {
+class BlocListener<T extends BaseBloc> extends StatefulWidget {
   final Widget child;
   final Function(BaseEvent event) listener;
 
@@ -13,20 +13,18 @@ class BlocListener extends StatefulWidget {
   });
 
   @override
-  _BlocListenerState createState() => _BlocListenerState();
+  _BlocListenerState createState() => _BlocListenerState<T>();
 }
 
-class _BlocListenerState extends State<BlocListener> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _BlocListenerState<T> extends State<BlocListener> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Provider.of<SignInBloc>(context).processEventStream.listen(
+
+    var bloc = Provider.of<T>(context) as BaseBloc;
+    bloc.processEventStream.listen(
       (event) {
+        print('khong the hieu noi');
         widget.listener(event);
       },
     );
@@ -35,7 +33,7 @@ class _BlocListenerState extends State<BlocListener> {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<BaseEvent>.value(
-      value: Provider.of<SignInBloc>(context).processEventStream,
+      value: (Provider.of<T>(context) as BaseBloc).processEventStream,
       initialData: null,
       updateShouldNotify: (prev, current) {
         return false;

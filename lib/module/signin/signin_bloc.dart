@@ -79,23 +79,23 @@ class SignInBloc extends BaseBloc {
   }
 
   handleSignIn(event) {
-    //btnSink.add(false);
-    loadingSink.add(true);
+    btnSink.add(false); //Khi bắt đầu call api thì disable nút sign-in
+    loadingSink.add(true); // show loading
 
-    SignInEvent e = event as SignInEvent;
-    _userRepo.signIn(e.phone, e.pass).then(
-      (userData) {
-        processEventSink.add(SignInSuccessEvent(userData));
-      },
-      onError: (e) {
-        //btnSink.add(true);
-
-        Future.delayed(Duration(seconds: 6), () {
-          loadingSink.add(false);
-          processEventSink.add(SignInFailEvent(e.toString()));
-        });
-      },
-    );
+    Future.delayed(Duration(seconds: 6), () {
+      SignInEvent e = event as SignInEvent;
+      _userRepo.signIn(e.phone, e.pass).then(
+        (userData) {
+          processEventSink.add(SignInSuccessEvent(userData));
+        },
+        onError: (e) {
+          btnSink.add(true); //Khi có kết quả thì enable nút sign-in trở lại
+          loadingSink.add(false); // hide loading
+          processEventSink
+              .add(SignInFailEvent(e.toString())); // thông báo kết quả
+        },
+      );
+    });
   }
 
   @override
