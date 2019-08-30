@@ -10,8 +10,9 @@ class PageContainer extends StatelessWidget {
 
   final List<SingleChildCloneableWidget> bloc;
   final List<SingleChildCloneableWidget> di;
+  final List<Widget> actions;
 
-  PageContainer({this.title, this.bloc, this.di, this.child});
+  PageContainer({this.title, this.bloc, this.di, this.actions, this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,7 @@ class PageContainer extends StatelessWidget {
           title,
           style: TextStyle(color: AppColor.blue),
         ),
+        actions: actions,
       ),
       body: MultiProvider(
         providers: [
@@ -28,6 +30,17 @@ class PageContainer extends StatelessWidget {
           ...bloc,
         ],
         child: child,
+      ),
+    );
+  }
+}
+
+class NavigatorProvider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Stack(
+        children: <Widget>[],
       ),
     );
   }

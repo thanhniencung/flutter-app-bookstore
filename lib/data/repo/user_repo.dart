@@ -21,8 +21,8 @@ class UserRepo {
         SPref.instance.set(SPrefCache.KEY_TOKEN, userData.token);
         c.complete(userData);
       }
-    } on DioError catch (e) {
-      print(e.response.data);
+    } on DioError {
+      //print(e.response.data);
       c.completeError('Đăng nhập thất bại');
     } catch (e) {
       c.completeError(e);
@@ -40,8 +40,8 @@ class UserRepo {
         SPref.instance.set(SPrefCache.KEY_TOKEN, userData.token);
         c.complete(userData);
       }
-    } on DioError catch (e) {
-      print(e.response.data);
+    } on DioError {
+      //print(e.response.data);
       c.completeError('Đăng ký thất bại');
     } catch (e) {
       c.completeError(e);

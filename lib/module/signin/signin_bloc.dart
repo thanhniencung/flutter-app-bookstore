@@ -6,9 +6,12 @@ import 'package:flutter_app_book_store/base/base_bloc.dart';
 import 'package:flutter_app_book_store/base/base_event.dart';
 import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/data/spref/spref.dart';
+import 'package:flutter_app_book_store/event/signin_fail_event.dart';
+import 'package:flutter_app_book_store/event/signin_sucess_event.dart';
 import 'package:flutter_app_book_store/event/signup_event.dart';
 import 'package:flutter_app_book_store/event/singin_event.dart';
 import 'package:flutter_app_book_store/shared/constant.dart';
+import 'package:flutter_app_book_store/shared/model/user_data.dart';
 import 'package:flutter_app_book_store/shared/validation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -16,6 +19,8 @@ class SignInBloc extends BaseBloc {
   final _phoneSubject = BehaviorSubject<String>();
   final _passSubject = BehaviorSubject<String>();
   final _btnSubject = BehaviorSubject<bool>();
+
+  final _userSubject = BehaviorSubject<UserData>();
 
   UserRepo _userRepo;
 
@@ -53,6 +58,9 @@ class SignInBloc extends BaseBloc {
   Stream<bool> get btnStream => _btnSubject.stream;
   Sink<bool> get btnSink => _btnSubject.sink;
 
+  Stream<UserData> get userStream => _userSubject.stream;
+  Sink<UserData> get userSink => _userSubject.sink;
+
   validateForm() {
     Observable.combineLatest2(
       _phoneSubject,
@@ -75,13 +83,21 @@ class SignInBloc extends BaseBloc {
   }
 
   handleSignIn(event) {
+    //btnSink.add(false);
+    loadingSink.add(true);
+
     SignInEvent e = event as SignInEvent;
     _userRepo.signIn(e.phone, e.pass).then(
       (userData) {
-        print(userData);
+        processEventSink.add(SignInSuccessEvent(userData));
       },
       onError: (e) {
-        print(e);
+        //btnSink.add(true);
+
+        Future.delayed(Duration(seconds: 6), () {
+          loadingSink.add(false);
+          processEventSink.add(SignInFailEvent(e.toString()));
+        });
       },
     );
   }
@@ -94,5 +110,6 @@ class SignInBloc extends BaseBloc {
     _phoneSubject.close();
     _passSubject.close();
     _btnSubject.close();
+    _userSubject.close();
   }
 }

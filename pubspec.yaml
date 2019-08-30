@@ -27,6 +27,7 @@ dependencies:
   dio: ^2.1.16
   shared_preferences: ^0.5.3+4
   rxdart: ^0.22.2
+  flutter_spinkit: ^4.0.0
 
 dev_dependencies:
   flutter_test:
