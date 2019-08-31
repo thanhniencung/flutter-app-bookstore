@@ -10,6 +10,7 @@ abstract class BaseBloc {
       BehaviorSubject<BaseEvent>();
 
   StreamController<bool> _loadingStreamController = StreamController<bool>();
+
   StreamController<BaseEvent> _eventStreamController =
       StreamController<BaseEvent>();
 
