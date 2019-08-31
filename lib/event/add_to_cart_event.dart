@@ -1,6 +1,8 @@
 import 'package:flutter_app_book_store/base/base_event.dart';
+import 'package:flutter_app_book_store/shared/model/product.dart';
 
 class AddToCartEvent extends BaseEvent {
-  int count;
-  AddToCartEvent(this.count);
+  Product product;
+
+  AddToCartEvent(this.product);
 }

@@ -89,6 +89,7 @@ class SignInBloc extends BaseBloc {
           processEventSink.add(SignInSuccessEvent(userData));
         },
         onError: (e) {
+          print(e);
           btnSink.add(true); //Khi có kết quả thì enable nút sign-in trở lại
           loadingSink.add(false); // hide loading
           processEventSink

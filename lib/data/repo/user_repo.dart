@@ -22,7 +22,6 @@ class UserRepo {
         c.complete(userData);
       }
     } on DioError {
-      //print(e.response.data);
       c.completeError('Đăng nhập thất bại');
     } catch (e) {
       c.completeError(e);
@@ -41,7 +40,6 @@ class UserRepo {
         c.complete(userData);
       }
     } on DioError {
-      //print(e.response.data);
       c.completeError('Đăng ký thất bại');
     } catch (e) {
       c.completeError(e);

@@ -1,5 +1,14 @@
-class ShoppingCart {
-  int count;
+import 'package:flutter_app_book_store/shared/model/product.dart';
 
-  ShoppingCart(this.count);
+class ShoppingCart {
+  String orderId;
+  int total;
+  List<Product> productList;
+
+  ShoppingCart({this.orderId, this.total, this.productList});
+
+  factory ShoppingCart.fromJson(Map<String, dynamic> json) => ShoppingCart(
+        orderId: json['orderId'] ?? '',
+        total: json["total"],
+      );
 }

@@ -3,14 +3,16 @@ import 'package:flutter_app_book_store/base/base_bloc.dart';
 import 'package:flutter_app_book_store/base/base_event.dart';
 import 'package:flutter_app_book_store/data/repo/order_repo.dart';
 import 'package:flutter_app_book_store/data/repo/product_repo.dart';
-import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/event/add_to_cart_event.dart';
+import 'package:flutter_app_book_store/shared/model/product.dart';
 import 'package:flutter_app_book_store/shared/model/shopping_cart.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeBloc extends BaseBloc {
   final ProductRepo _productRepo;
   final OrderRepo _orderRepo;
+
+  var _shoppingCart = ShoppingCart();
 
   static HomeBloc _instance;
 
@@ -33,10 +35,10 @@ class HomeBloc extends BaseBloc {
   })  : _productRepo = productRepo,
         _orderRepo = orderRepo;
 
-  final _shoppingCardSubject = BehaviorSubject<AddToCartEvent>();
+  final _shoppingCardSubject = BehaviorSubject<ShoppingCart>();
 
-  Stream<AddToCartEvent> get shoppingCartStream => _shoppingCardSubject.stream;
-  Sink<AddToCartEvent> get shoppingCartSink => _shoppingCardSubject.sink;
+  Stream<ShoppingCart> get shoppingCartStream => _shoppingCardSubject.stream;
+  Sink<ShoppingCart> get shoppingCartSink => _shoppingCardSubject.sink;
 
   @override
   void dispatchEvent(BaseEvent event) {
@@ -47,12 +49,25 @@ class HomeBloc extends BaseBloc {
     }
   }
 
-  static int count = 0;
   handleAddToCart(event) {
-    count++;
-    print(count.toString());
-    var addToCart = AddToCartEvent(count);
-    shoppingCartSink.add(addToCart);
+    AddToCartEvent addToCartEvent = event as AddToCartEvent;
+    _orderRepo.addToCart(addToCartEvent.product).then((shoppingCart) {
+      shoppingCart.orderId = _shoppingCart.orderId;
+      print(shoppingCart);
+      shoppingCartSink.add(shoppingCart);
+    });
+  }
+
+  getShoppingCartInfo() {
+    Stream<ShoppingCart>.fromFuture(_orderRepo.getShoppingCartInfo())
+        .listen((shoppingCart) {
+      _shoppingCart = shoppingCart;
+      shoppingCartSink.add(shoppingCart);
+    });
+  }
+
+  Stream<List<Product>> getProductList() {
+    return Stream<List<Product>>.fromFuture(_productRepo.getProductList());
   }
 
   @override

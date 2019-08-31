@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_book_store/base/base_widget.dart';
 import 'package:flutter_app_book_store/data/remote/order_service.dart';
 import 'package:flutter_app_book_store/data/remote/product_service.dart';
-import 'package:flutter_app_book_store/data/remote/user_service.dart';
 import 'package:flutter_app_book_store/data/repo/order_repo.dart';
 import 'package:flutter_app_book_store/data/repo/product_repo.dart';
-import 'package:flutter_app_book_store/data/repo/user_repo.dart';
 import 'package:flutter_app_book_store/event/add_to_cart_event.dart';
 import 'package:flutter_app_book_store/module/home/home_bloc.dart';
 import 'package:flutter_app_book_store/shared/app_color.dart';
+import 'package:flutter_app_book_store/shared/model/product.dart';
+import 'package:flutter_app_book_store/shared/model/rest_error.dart';
 import 'package:flutter_app_book_store/shared/model/shopping_cart.dart';
+import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -51,27 +52,59 @@ class ShoppingCartWidget extends StatelessWidget {
         productRepo: Provider.of(context),
         orderRepo: Provider.of(context),
       ),
-      child: Consumer<HomeBloc>(
-        builder: (context, bloc, child) => StreamProvider<AddToCartEvent>.value(
-          value: bloc.shoppingCartStream,
-          initialData: AddToCartEvent(0),
-          child: Consumer<AddToCartEvent>(
-            builder: (context, cart, child) {
-              return Container(
+      child: CartWidget(),
+    );
+  }
+}
+
+class CartWidget extends StatefulWidget {
+  @override
+  _CartWidgetState createState() => _CartWidgetState();
+}
+
+class _CartWidgetState extends State<CartWidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    var bloc = Provider.of<HomeBloc>(context);
+    bloc.getShoppingCartInfo();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HomeBloc>(
+      builder: (context, bloc, child) => StreamProvider<ShoppingCart>.value(
+        value: bloc.shoppingCartStream,
+        initialData: null,
+        child: Consumer<ShoppingCart>(
+          builder: (context, cart, child) {
+            return GestureDetector(
+              onTap: () {
+                print(cart.orderId);
+              },
+              child: Container(
                 margin: EdgeInsets.only(top: 15, right: 20),
-                child: Badge(
-                  badgeContent: Text(
-                    '${cart.count}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  child: Icon(Icons.shopping_cart),
-                ),
-              );
-            },
-          ),
+                child: cart == null
+                    ? Icon(Icons.shopping_cart)
+                    : Badge(
+                        badgeContent: Text(
+                          '${cart.total}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        child: Icon(Icons.shopping_cart),
+                      ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -79,12 +112,6 @@ class ShoppingCartWidget extends StatelessWidget {
 }
 
 class ProductListWidget extends StatelessWidget {
-  final images = [
-    'https://cdn0.fahasa.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/i/m/image_176880.jpg',
-    'https://cdn0.fahasa.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/9/7/9786047732524-1.jpg',
-    'https://cdn0.fahasa.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/9/7/9786047732555.jpg',
-    'https://cdn0.fahasa.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/8/9/8936037710327.jpg',
-  ];
   @override
   Widget build(BuildContext context) {
     return Provider<HomeBloc>.value(
@@ -93,19 +120,47 @@ class ProductListWidget extends StatelessWidget {
         orderRepo: Provider.of(context),
       ),
       child: Consumer<HomeBloc>(
-        builder: (context, bloc, child) => Container(
-          color: AppColor.white,
-          child: ListView.builder(
-              itemCount: images.length,
-              itemBuilder: (context, index) {
-                return _buildRow(bloc, images[index]);
-              }),
+        builder: (context, bloc, child) => StreamProvider<dynamic>.value(
+          value: bloc.getProductList(),
+          initialData: null,
+          catchError: (context, error) {
+            return error;
+          },
+          child: Consumer<dynamic>(
+            builder: (context, data, child) {
+              if (data == null) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: AppColor.yellow,
+                  ),
+                );
+              }
+
+              if (data is RestError) {
+                return Center(
+                  child: Container(
+                    child: Text(
+                      data.message,
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                );
+              }
+
+              data = data as List<Product>;
+              return ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return _buildRow(bloc, data[index]);
+                  });
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildRow(HomeBloc bloc, String imageUrl) {
+  Widget _buildRow(HomeBloc bloc, Product product) {
     return Container(
       height: 180,
       child: Card(
@@ -118,7 +173,7 @@ class ProductListWidget extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  imageUrl,
+                  product.productImage,
                   width: 100,
                   height: 150,
                 ),
@@ -129,11 +184,11 @@ class ProductListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.only(top: 15, left: 15),
+                      margin: EdgeInsets.only(top: 15, left: 15, right: 10),
                       child: Text(
-                        'Học tiếng anh cùng Pokémon',
+                        '${product.productName}',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           color: Colors.black,
                         ),
                       ),
@@ -141,7 +196,7 @@ class ProductListWidget extends StatelessWidget {
                     Container(
                       margin: EdgeInsets.only(top: 5, left: 15),
                       child: Text(
-                        '30 quấn',
+                        '${product.quantity} quấn',
                         style: TextStyle(color: AppColor.blue, fontSize: 17),
                       ),
                     ),
@@ -152,7 +207,10 @@ class ProductListWidget extends StatelessWidget {
                           Container(
                             margin: EdgeInsets.only(top: 5, left: 15),
                             child: Text(
-                              '100.000 vnđ',
+                              '${FlutterMoneyFormatter(settings: MoneyFormatterSettings(
+                                    symbol: 'vnđ',
+                                    fractionDigits: 0,
+                                  ), amount: product.price).output.symbolOnRight}',
                               style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 17,
@@ -173,7 +231,7 @@ class ProductListWidget extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                bloc.event.add(AddToCartEvent(0));
+                                bloc.event.add(AddToCartEvent(product));
                               },
                               child: Text(
                                 ' Buy now ',
