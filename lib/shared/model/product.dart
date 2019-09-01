@@ -9,6 +9,7 @@
     }
  */
 class Product {
+  String orderId;
   String productId;
   String productName;
   String productImage;
@@ -17,6 +18,7 @@ class Product {
   double price;
 
   Product({
+    this.orderId,
     this.productId,
     this.productName,
     this.productImage,
@@ -31,6 +33,7 @@ class Product {
   }
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
+        orderId: json["orderId"] ?? '',
         productId: json["productId"],
         productName: json["productName"],
         productImage: json["productImage"],

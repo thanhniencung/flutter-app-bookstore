@@ -52,22 +52,25 @@ class HomeBloc extends BaseBloc {
   handleAddToCart(event) {
     AddToCartEvent addToCartEvent = event as AddToCartEvent;
     _orderRepo.addToCart(addToCartEvent.product).then((shoppingCart) {
-      shoppingCart.orderId = _shoppingCart.orderId;
-      print(shoppingCart);
+      _shoppingCart.orderId = shoppingCart.orderId;
       shoppingCartSink.add(shoppingCart);
     });
   }
 
   getShoppingCartInfo() {
-    Stream<ShoppingCart>.fromFuture(_orderRepo.getShoppingCartInfo())
-        .listen((shoppingCart) {
+    Stream<ShoppingCart>.fromFuture(_orderRepo.getShoppingCartInfo()).listen(
+        (shoppingCart) {
       _shoppingCart = shoppingCart;
       shoppingCartSink.add(shoppingCart);
+    }, onError: (err) {
+      _shoppingCardSubject.addError(err);
     });
   }
 
   Stream<List<Product>> getProductList() {
-    return Stream<List<Product>>.fromFuture(_productRepo.getProductList());
+    return Stream<List<Product>>.fromFuture(
+      _productRepo.getProductList(),
+    );
   }
 
   @override

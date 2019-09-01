@@ -15,4 +15,34 @@ class OrderService {
       data: product.toJson(),
     );
   }
+
+  Future<Response> orderDetail(String orderId) {
+    return BookClient.instance.dio.get(
+      '/order/detail',
+      queryParameters: {
+        'order_id': orderId,
+      },
+    );
+  }
+
+  Future<Response> updateOrder(Product product) {
+    return BookClient.instance.dio.post(
+      '/order/update',
+      data: {
+        'orderId': product.orderId,
+        'quantity': product.quantity,
+        'productId': product.productId,
+      },
+    );
+  }
+
+  Future<Response> confirm(String orderId) {
+    return BookClient.instance.dio.post(
+      '/order/confirm',
+      data: {
+        'orderId': orderId,
+        'status': 'CONFIRM',
+      },
+    );
+  }
 }

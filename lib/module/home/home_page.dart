@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageContainer(
-      title: 'Home',
+      title: 'Gopher',
       di: [
         Provider.value(
           value: ProductService(),
@@ -79,29 +79,42 @@ class _CartWidgetState extends State<CartWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeBloc>(
-      builder: (context, bloc, child) => StreamProvider<ShoppingCart>.value(
+      builder: (context, bloc, child) => StreamProvider<dynamic>.value(
         value: bloc.shoppingCartStream,
         initialData: null,
-        child: Consumer<ShoppingCart>(
-          builder: (context, cart, child) {
+        catchError: (context, error) {
+          return error;
+        },
+        child: Consumer<dynamic>(
+          builder: (context, data, child) {
+            if (data == null || data is RestError) {
+              return Container(
+                margin: EdgeInsets.only(top: 15, right: 20),
+                child: Icon(Icons.shopping_cart),
+              );
+            }
+
+            var cart = data as ShoppingCart;
             return GestureDetector(
               onTap: () {
-                print(cart.orderId);
+                if (data == null) {
+                  return;
+                }
+                Navigator.pushNamed(context, '/checkout',
+                    arguments: cart.orderId);
               },
               child: Container(
                 margin: EdgeInsets.only(top: 15, right: 20),
-                child: cart == null
-                    ? Icon(Icons.shopping_cart)
-                    : Badge(
-                        badgeContent: Text(
-                          '${cart.total}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        child: Icon(Icons.shopping_cart),
-                      ),
+                child: Badge(
+                  badgeContent: Text(
+                    '${cart.total}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  child: Icon(Icons.shopping_cart),
+                ),
               ),
             );
           },
@@ -120,40 +133,42 @@ class ProductListWidget extends StatelessWidget {
         orderRepo: Provider.of(context),
       ),
       child: Consumer<HomeBloc>(
-        builder: (context, bloc, child) => StreamProvider<dynamic>.value(
-          value: bloc.getProductList(),
-          initialData: null,
-          catchError: (context, error) {
-            return error;
-          },
-          child: Consumer<dynamic>(
-            builder: (context, data, child) {
-              if (data == null) {
-                return Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: AppColor.yellow,
-                  ),
-                );
-              }
-
-              if (data is RestError) {
-                return Center(
-                  child: Container(
-                    child: Text(
-                      data.message,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ),
-                );
-              }
-
-              data = data as List<Product>;
-              return ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return _buildRow(bloc, data[index]);
-                  });
+        builder: (context, bloc, child) => Container(
+          child: StreamProvider<dynamic>.value(
+            value: bloc.getProductList(),
+            initialData: null,
+            catchError: (context, error) {
+              return error;
             },
+            child: Consumer<dynamic>(
+              builder: (context, data, child) {
+                if (data == null) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: AppColor.yellow,
+                    ),
+                  );
+                }
+
+                if (data is RestError) {
+                  return Center(
+                    child: Container(
+                      child: Text(
+                        data.message,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  );
+                }
+
+                data = data as List<Product>;
+                return ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return _buildRow(bloc, data[index]);
+                    });
+              },
+            ),
           ),
         ),
       ),
