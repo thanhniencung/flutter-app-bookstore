@@ -39,24 +39,20 @@ class CheckoutPage extends StatelessWidget {
         ),
       ],
       bloc: [],
-      child: ShoppingCartInfoWidget(),
+      child: ShoppingCartContainer(),
     );
   }
 }
 
-class ShoppingCartInfoWidget extends StatefulWidget {
+class ShoppingCartContainer extends StatefulWidget {
   @override
-  _ShoppingCartInfoWidgetState createState() => _ShoppingCartInfoWidgetState();
+  _ShoppingCartContainerState createState() => _ShoppingCartContainerState();
 }
 
-class _ShoppingCartInfoWidgetState extends State<ShoppingCartInfoWidget> {
-  bool shouldRebuild = true;
+class _ShoppingCartContainerState extends State<ShoppingCartContainer> {
   handleEvent(BaseEvent event) {
-    if (event is ShouldRebuildEvent) {
-      setState(() {});
-    } else if (event is ShouldPopEvent) {
+    if (event is ShouldPopEvent) {
       setState(() {
-        shouldRebuild = false;
         Navigator.pop(context);
       });
     }
@@ -71,45 +67,63 @@ class _ShoppingCartInfoWidgetState extends State<ShoppingCartInfoWidget> {
       child: Consumer<CheckoutBloc>(
         builder: (context, bloc, child) => BlocListener<CheckoutBloc>(
           listener: handleEvent,
-          child: StreamProvider<dynamic>.value(
-            value: bloc.getOrderDetail(),
-            initialData: null,
-            catchError: (context, err) {
-              return err;
-            },
-            updateShouldNotify: (prev, current) {
-              return shouldRebuild;
-            },
-            child: Consumer<dynamic>(
-              builder: (context, data, child) {
-                if (data == null) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                if (data is RestError) {
-                  return Center(
-                      child: Container(
-                    child: Text(data.message),
-                  ));
-                }
-
-                if (data is Order) {
-                  return Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: ProductListWidget(data.items),
-                      ),
-                      ConfirmInfoWidget(data.total),
-                    ],
-                  );
-                }
-                return Container();
-              },
-            ),
-          ),
+          child: ShoppingCart(bloc),
         ),
+      ),
+    );
+  }
+}
+
+class ShoppingCart extends StatefulWidget {
+  final CheckoutBloc bloc;
+  ShoppingCart(this.bloc);
+
+  @override
+  _ShoppingCartState createState() => _ShoppingCartState();
+}
+
+class _ShoppingCartState extends State<ShoppingCart> {
+  @override
+  void initState() {
+    super.initState();
+    widget.bloc.getOrderDetail();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamProvider<dynamic>.value(
+      value: widget.bloc.orderStream,
+      initialData: null,
+      catchError: (context, err) {
+        return err;
+      },
+      child: Consumer<dynamic>(
+        builder: (context, data, child) {
+          if (data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (data is RestError) {
+            return Center(
+                child: Container(
+              child: Text(data.message),
+            ));
+          }
+
+          if (data is Order) {
+            return Column(
+              children: <Widget>[
+                Expanded(
+                  child: ProductListWidget(data.items),
+                ),
+                ConfirmInfoWidget(data.total),
+              ],
+            );
+          }
+          return Container();
+        },
       ),
     );
   }

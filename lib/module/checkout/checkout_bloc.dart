@@ -7,6 +7,7 @@ import 'package:flutter_app_book_store/event/pop_event.dart';
 import 'package:flutter_app_book_store/event/rebuild_event.dart';
 import 'package:flutter_app_book_store/event/update_cart_event.dart';
 import 'package:flutter_app_book_store/shared/model/order.dart';
+import 'package:rxdart/rxdart.dart';
 
 class CheckoutBloc extends BaseBloc {
   final OrderRepo _orderRepo;
@@ -14,6 +15,11 @@ class CheckoutBloc extends BaseBloc {
   CheckoutBloc({
     @required OrderRepo orderRepo,
   }) : _orderRepo = orderRepo;
+
+  final _orderSubject = BehaviorSubject<Order>();
+
+  Stream<Order> get orderStream => _orderSubject.stream;
+  Sink<Order> get orderSink => _orderSubject.sink;
 
   @override
   void dispatchEvent(BaseEvent event) {
@@ -35,21 +41,25 @@ class CheckoutBloc extends BaseBloc {
 
   handleUpdateCart(event) {
     UpdateCartEvent e = event as UpdateCartEvent;
-    _orderRepo.updateOrder(e.product).then((isSuccess) {
-      if (isSuccess) {
-        processEventSink.add(ShouldRebuildEvent());
-      }
+
+    Observable.fromFuture(_orderRepo.updateOrder(e.product))
+        .flatMap((_) => Observable.fromFuture(_orderRepo.getOrderDetail()))
+        .listen((order) {
+      orderSink.add(order);
     });
   }
 
-  Stream<Order> getOrderDetail() {
-    return Stream<Order>.fromFuture(
+  getOrderDetail() {
+    Stream<Order>.fromFuture(
       _orderRepo.getOrderDetail(),
-    );
+    ).listen((order) {
+      orderSink.add(order);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
+    _orderSubject.close();
   }
 }

@@ -70,14 +70,18 @@ class _SignInFormWidgetState extends State<SignInFormWidget> {
               bloc: bloc,
               child: Container(
                 padding: EdgeInsets.all(25),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _buildPhoneField(bloc),
-                    _buildPassField(bloc),
-                    buildSignInButton(bloc),
-                    _buildFooter(context),
-                  ],
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        _buildPhoneField(bloc),
+                        _buildPassField(bloc),
+                        buildSignInButton(bloc),
+                        _buildFooter(context),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
