@@ -45,7 +45,6 @@ class OrderRepo {
   }
 
   Future<Order> getOrderDetail() async {
-    print('getOrderDetail');
     var c = Completer<Order>();
     try {
       var response = await _orderService.orderDetail(_orderId);

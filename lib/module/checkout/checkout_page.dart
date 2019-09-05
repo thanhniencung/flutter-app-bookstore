@@ -52,9 +52,7 @@ class ShoppingCartContainer extends StatefulWidget {
 class _ShoppingCartContainerState extends State<ShoppingCartContainer> {
   handleEvent(BaseEvent event) {
     if (event is ShouldPopEvent) {
-      setState(() {
-        Navigator.pop(context);
-      });
+      Navigator.pop(context);
     }
   }
 
