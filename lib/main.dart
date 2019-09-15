@@ -3,6 +3,7 @@ import 'package:flutter_app_book_store/module/checkout/checkout_page.dart';
 import 'package:flutter_app_book_store/module/home/home_page.dart';
 import 'package:flutter_app_book_store/module/signin/signin_page.dart';
 import 'package:flutter_app_book_store/module/signup/signup_page.dart';
+import 'package:flutter_app_book_store/module/splash/splash.dart';
 import 'package:flutter_app_book_store/shared/app_color.dart';
 
 void main() => runApp(MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: <String, WidgetBuilder>{
-        '/': (context) => SignInPage(),
+        '/': (context) => SplashPage(),
         '/home': (context) => HomePage(),
         '/sign-in': (context) => SignInPage(),
         '/sign-up': (context) => SignUpPage(),
