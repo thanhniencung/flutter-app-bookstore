@@ -23,7 +23,7 @@ class SignInPage extends StatelessWidget {
           value: UserService(),
         ),
         ProxyProvider<UserService, UserRepo>(
-          builder: (context, userService, previous) =>
+          update: (context, userService, previous) =>
               UserRepo(userService: userService),
         ),
       ],
@@ -60,8 +60,8 @@ class _SignInFormWidgetState extends State<SignInFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<SignInBloc>.value(
-      value: SignInBloc(userRepo: Provider.of(context)),
+    return ChangeNotifierProvider(
+      create: (_) => SignInBloc(userRepo: Provider.of(context)),
       child: Consumer<SignInBloc>(
         builder: (context, bloc, child) {
           return BlocListener<SignInBloc>(

@@ -11,7 +11,7 @@ import 'package:flutter_app_book_store/shared/model/user_data.dart';
 import 'package:flutter_app_book_store/shared/validation.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SignInBloc extends BaseBloc {
+class SignInBloc extends BaseBloc with ChangeNotifier {
   final _phoneSubject = BehaviorSubject<String>();
   final _passSubject = BehaviorSubject<String>();
   final _btnSubject = BehaviorSubject<bool>();
@@ -103,6 +103,8 @@ class SignInBloc extends BaseBloc {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+
+    print("singin close");
 
     _phoneSubject.close();
     _passSubject.close();

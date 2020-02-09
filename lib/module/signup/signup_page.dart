@@ -24,7 +24,7 @@ class SignUpPage extends StatelessWidget {
           value: UserService(),
         ),
         ProxyProvider<UserService, UserRepo>(
-          builder: (context, userService, previous) =>
+          update: (context, userService, previous) =>
               UserRepo(userService: userService),
         ),
       ],
@@ -67,8 +67,8 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Provider<SignUpBloc>.value(
-      value: SignUpBloc(userRepo: Provider.of(context)),
+    return ChangeNotifierProvider(
+      create: (_) => SignUpBloc(userRepo: Provider.of(context)),
       child: Consumer<SignUpBloc>(
         builder: (context, bloc, child) => BlocListener<SignUpBloc>(
           listener: handleEvent,

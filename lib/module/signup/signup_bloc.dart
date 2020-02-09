@@ -10,7 +10,7 @@ import 'package:flutter_app_book_store/event/signup_sucess_event.dart';
 import 'package:flutter_app_book_store/shared/validation.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SignUpBloc extends BaseBloc {
+class SignUpBloc extends BaseBloc with ChangeNotifier {
   final _displayNameSubject = BehaviorSubject<String>();
   final _phoneSubject = BehaviorSubject<String>();
   final _passSubject = BehaviorSubject<String>();
@@ -108,6 +108,8 @@ class SignUpBloc extends BaseBloc {
   @override
   void dispose() {
     super.dispose();
+
+    print("signup close");
 
     _displayNameSubject.close();
     _phoneSubject.close();

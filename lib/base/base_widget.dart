@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_book_store/shared/app_color.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 class PageContainer extends StatelessWidget {
   final String title;
   final Widget child;
 
-  final List<SingleChildCloneableWidget> bloc;
-  final List<SingleChildCloneableWidget> di;
+  final List<SingleChildWidget> bloc;
+  final List<SingleChildWidget> di;
   final List<Widget> actions;
 
   PageContainer({this.title, this.bloc, this.di, this.actions, this.child});
